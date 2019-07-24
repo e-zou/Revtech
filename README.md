@@ -1,6 +1,6 @@
 # Revtech (a.k.a RevTek)
 
-RevTek is a project built in React for a mock company called "RevTek". The aim is to build a platform that matches companies with students. Features include: contract submissions, ability to comment, viewing of profiles, and accounting for different user roles. 
+RevTek is a project built in React for a mock company called "RevTek". The aim is to build a platform that matches companies with students. Features include: contract submissions, ability to comment, viewing of profiles, and accounting for different user roles. Click [here](https://glacial-woodland-13699.herokuapp.com) for a demo :)
 
 ## Next Steps
 This project is still incomplete, but below are the requirements we hoped to fulfill if we had more time to work on the project.
