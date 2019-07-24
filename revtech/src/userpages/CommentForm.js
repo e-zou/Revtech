@@ -57,9 +57,10 @@ export default function CommentForm(props) {
                     display='flex'
                     flexDirection='column'
                     justifyContent='space-evenly'
+                    boxShadow = {7}
                 >
                     <Typography style={studentStyle}>
-                        Student Name
+                        Express Interest
                     </Typography>
 
                     <TextField

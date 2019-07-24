@@ -7,11 +7,12 @@ import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import Comment from './Comment';
 import CommentForm from './CommentForm';
 import firebase from '../firebase/firebase';
-
+import '../App.css'
 
 export default function Posting(props) {
 
     const [comments, setComments] = useState([]);
+    const [reload, setReload] = useState(false);
 
     const [hideComments, setHideComments] = useState(true);
 
@@ -29,10 +30,12 @@ export default function Posting(props) {
         height: props.height,
         marginLeft: props.leftMargin,
         marginTop: '4%',
-        textAlign: 'center'
+        textAlign: 'center',
+ 
+
     }
 
-    useEffect(() => {
+    const getComments = () => {
         const parentKey = props.parentId;
 
         const commentRef = firebase.database().ref('/comments');
@@ -44,14 +47,21 @@ export default function Posting(props) {
             currKeys.forEach(key => {
                 const commentContractId = currComments[key].parentContract;
                 if (commentContractId === parentKey) {
-                    tempComments.push(<Comment hidden={hideComments} comment={currComments[key]} />);
+                    tempComments.push(<Comment reloadParent={setReload} hidden={hideComments} comment={currComments[key]} comKey={key}/>);
                 }
             });
         });
         setComments(tempComments);
+    }
+
+    useEffect(() => {
+        getComments();
     })
 
-
+    if (reload) {
+        getComments();
+        setReload(false);
+    }
 
     return (
         <React.Fragment>
@@ -63,10 +73,18 @@ export default function Posting(props) {
                     flexDirection='column'
                     justifyContent='space-evenly'
                     width='100%'
-                    height='100%'                    
+                    height='100%' 
+                    boxShadow = {7}
+                                    
                 >
+                    <Typography variant="h4" component="h3">
+                        {props.contract.companyName}
+                    </Typography>
                     <Typography variant="h5" component="h3">
-                        {props.contract.email}
+                        {props.contract.companyEmail}
+                    </Typography>
+                    <Typography variant="h5" component="h3">
+                        {props.contract.project}
                     </Typography>
                     <Typography variant="body1" component="h3">
                         {props.contract.description}
@@ -76,6 +94,8 @@ export default function Posting(props) {
                         flexDirection='row'
                         justifyContent='flex-end'
                         marginRight='5%'
+                     
+                       
                     >
                     {props.arrow? (<ArrowDownwardIcon onClick={handleClick}></ArrowDownwardIcon>):<div></div>}
                     </Box>

@@ -1,5 +1,6 @@
 import React, { Component, useEffect, useState } from 'react';
 import Navbar from './../components/Navbar.js'
+import Footer from './../components/Footer.js'
 
 import Grid from '@material-ui/core/Grid';
 
@@ -18,8 +19,9 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import firebase from '../firebase/firebase';
-
+import axios from 'axios';
 import clsx from 'clsx';
+import Box from '@material-ui/core/Box';
 
 function Students(){
     const [students, setStudents] = useState([]);
@@ -46,7 +48,8 @@ function Students(){
     const renderStudents = () => {
       const studentDisplay = students.map(student => {
         return (
-          <Grid item md={4}>
+          
+          <Grid item md={4} key={Math.random()}>
             <MediaCard student={student} />
           </Grid>
         )
@@ -65,18 +68,15 @@ function Students(){
             <Grid
               container
               spacing={3}
-              display='flex'
-              flexDirection='row'
-              justifyContent='space-evenly'
               style={{
-                width: "100%",
+                width: "70%",
                 textAlign: "center",
-                marginLeft: "4%"
+                marginLeft: "15%"
               }}
             >
             {renderStudents()}
             </Grid>
-            
+            <Footer/>
         </div>
       );
     
@@ -86,16 +86,13 @@ export default Students;
 
 
 
-function getStudentData(){
-
-    
-}
 
 
 function MediaCard(props) {
     const useStyles = makeStyles({
         card: {
           maxWidth: 345,
+         
         },
         media: {
           height: 140,
@@ -103,6 +100,18 @@ function MediaCard(props) {
       });
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
+  const [picUrl, setPicUrl] = React.useState(chip);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:9000")
+      .then(res => {
+        setPicUrl(res.data.image);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }, []);
 
 
   function handleExpandClick() {
@@ -111,11 +120,19 @@ function MediaCard(props) {
 
 
   return (
+    <Box
+    
+    boxShadow = {7}
+    >
+
     <Card className={classes.card}>
       <CardActionArea>
         <CardMedia
            className={classes.media}
-           image={chip}
+           image={picUrl}
+           style={{
+             height: '300px',
+           }}
            //title="Student Profile"
         />
         <CardContent>
@@ -157,5 +174,6 @@ function MediaCard(props) {
         </CardContent>
       </Collapse>
     </Card>
+    </Box>
   );
 }

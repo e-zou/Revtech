@@ -13,6 +13,8 @@ import { Redirect } from 'react-router-dom';
 import Navbar from './../components/Navbar.js';
 import Snackbar from "@material-ui/core/Snackbar";
 
+
+
 const useStyles = makeStyles(theme => ({
   root: {
     width: '90%',
@@ -32,7 +34,7 @@ function getSteps() {
 
 
 
-function SignUpNew() {
+function SignUpNew(props) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [email, setEmail] = useState("");
@@ -45,6 +47,8 @@ function SignUpNew() {
   const [finished, setFinished] = useState(false);
   const [message, setMessage] = useState("");
   const steps = getSteps();
+
+  const { history } = props;
 
   function getStepContent(stepIndex) {
     switch (stepIndex) {
@@ -65,11 +69,12 @@ function SignUpNew() {
     }
   }
 
-  function handleNext() {
+  function handleNext(props) {
+
+
 
     if(email !== "" && pwd !== "" && firstName !== "" && lastName !==""){
       if(activeStep == 0){
-      firebase.auth().createUserWithEmailAndPassword(email, pwd)
       const promise = firebase.auth().createUserWithEmailAndPassword(email, pwd);
       promise.then((result)=>{
           console.log("done")
@@ -91,20 +96,36 @@ function SignUpNew() {
         
         // firebase.auth().createUserWithEmailAndPassword(email, pwd)
         // .then(() => {
+          let git;
+          if(github==""){
+            git = "https://github.com/samhecht";
+          }
+          else{
+            git = github;
+          }
+          let linked;
+          if(linkedIn==""){
+            linked = "https://www.linkedin.com/in/cwransleriv/";
+          }
+          else{
+            linked = linkedIn;
+          }
           // created a user now add everything to the db and redirect
           let currUser = {
-            userId: firebase.auth().currentUser.uid,
             email: firebase.auth().currentUser.email,
             first: firstName,
             last: lastName,
-            github: github,
-            linkedIn: linkedIn,
+            github: git,
+            linkedIn: linked,
             bio: bio,
-            permissions: "student",
+            permission: "student",
+            skills: "empty"
           }
-          const userRef = firebase.database().ref("students");
-          userRef.push(currUser);
+          const userRef = firebase.database().ref("students/"+firebase.auth().currentUser.uid);
+          userRef.update(currUser);
           setFinished(true);
+          history.push('/')
+
         // })
         // .catch(() => {
         //     console.log("error creating user");

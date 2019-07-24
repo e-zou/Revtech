@@ -2,10 +2,12 @@ import React, {useState, useEffect} from 'react';
 import Posting from './Posting';
 import { Box, Typography } from '@material-ui/core';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import firebase from '../firebase/firebase';
 
 export default function Marketplace() {
     const [postings, setPostings] = useState([]);
+
     const titleStyle = {
         marginTop: "5%",
     }
@@ -47,7 +49,7 @@ export default function Marketplace() {
             }}>
                 <p>Copyright 2019 the dream team!</p>
             </div>
-            
+            <Footer/>
         </div>
     );
 }

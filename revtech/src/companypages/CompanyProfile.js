@@ -41,7 +41,10 @@ export default class CompanyProfile extends React.Component {
     state = {
         // List of all Contracts
         contracts : [],
+        companies : [],
         authUser: null, 
+        companyName : "",
+        companyEmail : "",
 
         // Editing Contracts
         editing : false,
@@ -51,17 +54,37 @@ export default class CompanyProfile extends React.Component {
     }
     
     componentDidMount() {
+
         const contractsRef = firebase.database().ref('contracts');
+        const companyRef = firebase.database().ref('/companies');
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 let id = user.uid;
                 this.setState({ authUser : id});
+
+                companyRef.on("value", snap => {
+                    const tempCompanies = snap.val();
+                    // console.log(id);
+                    for (let company in tempCompanies) {
+                        if (id == tempCompanies[company].companyid) {
+                            let name = tempCompanies[company].name
+                            let email = tempCompanies[company].email
+                            // console.log("found a match in companies database");
+                            this.setState({
+                                companyName: name,
+                                companyEmail: email
+                            })
+                            // console.log(this.state.companyName);
+                        }
+                    }
+    
+                });
+                console.log("company Name" + this.state.companyName)
                 contractsRef.on('value', (snapshot) => {
                     let contracts = [];
                     let allContracts = snapshot.val();
+                    
                     for (let contract in allContracts) {
-                        // console.log(contract);
-                        // console.log(allContracts[contract].companyid);
                         if (allContracts[contract].companyid === this.state.authUser) {
                             let trimmed = "";
                             if (allContracts[contract].description.length >= 75) {
@@ -69,18 +92,24 @@ export default class CompanyProfile extends React.Component {
                             } else {
                                 trimmed = allContracts[contract].description
                             }
+                            let companyName = this.state.companyName
+                            let companyEmail = this.state.companyEmail
                             let pushContract = {
                                 contractid: contract,
                                 companyid: allContracts[contract].companyid,
+                                companyName: companyName,
+                                companyEmail: companyEmail,
                                 date: allContracts[contract].date,
                                 time: allContracts[contract].time,
-                                email: allContracts[contract].email,
+                                
                                 project: allContracts[contract].project,
                                 description: allContracts[contract].description,
                                 trimmedDescription: trimmed,
                                 status: allContracts[contract].approved, // not approved yet
                             }
                             contracts.push(pushContract);
+                            // console.log(pushContract.companyEmail);
+                            // console.log(pushContract.companyName);
                             // console.log(pushContract);
                         }
                     }
@@ -161,7 +190,7 @@ export default class CompanyProfile extends React.Component {
         <div>
         <Navbar/>
         <Container component="main">
-            <h1> Contracts</h1>
+            <h1>{this.state.companyName} Contracts</h1>
             <Table>
             <TableBody>
             <TableRow>

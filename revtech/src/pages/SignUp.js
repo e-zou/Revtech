@@ -6,9 +6,9 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-//import Link from '@material-ui/core/Link';
+
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
+
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -71,6 +71,11 @@ const { history } = props;
   const [message, setMessage] = useState("");
 
 
+  const [link, setLink] = useState("");
+  const handleLink= (e) => {
+    setLink(e.target.value);
+  };
+
   const handleSignUp = (e) => {
     e.preventDefault();
     
@@ -89,11 +94,12 @@ const { history } = props;
           companyid: firebase.auth().currentUser.uid,
           name: name,
           email: email,
-          permissions: 'company',
+          permission: 'company',
+          link: link
           
         }
         
-    usersRef.push(data); //might change users
+    usersRef.push(data); 
         history.push('/')
         
       },
@@ -158,6 +164,22 @@ const { history } = props;
            autoComplete="current-password"
            onChange={handlePassword}
          />
+
+
+        <TextField
+           variant="outlined"
+           margin="normal"
+           
+           fullWidth
+           name="link"
+           label="Link to website"
+           type="link"
+           id="link"
+         
+           onChange={handleLink}
+         />
+
+
          <FormControlLabel
            control={<Checkbox value="remember" color="primary" />}
            label="Remember me"

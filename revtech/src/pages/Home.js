@@ -1,5 +1,6 @@
-import React from 'react';
-import Navbar from './../components/Navbar.js'
+import React, { Component, useEffect, useState } from 'react';
+import Navbar from './../components/Navbar.js';
+import Footer from './../components/Footer.js'
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
@@ -8,9 +9,9 @@ import hero from '../images/hero.jpg';
 import app from '../images/app.jpeg';
 import office from '../images/office.jpeg';
 import students from '../images/students.jpeg';
-import logo from '../images/logo.png';
+import firebase from '../firebase/firebase';
 import { Link } from 'react-router-dom';
-import { withTheme } from '@material-ui/styles';
+
 
 const useStyles = makeStyles({
   root: {
@@ -18,11 +19,11 @@ const useStyles = makeStyles({
   },
 });
 
-function Home() {
+export default function Home(props) {
   const classes = useStyles();
 
   const imageBoxStyle = {
-    height:'825px',
+    height:'650px',
     overflow: 'hidden',
     position: 'relative',
   }
@@ -64,31 +65,38 @@ function Home() {
   }
 
   const heroTitle = {
-    fontSize: '60px',
+    fontSize: '50px',
     fontWeight: 'normal',
-    marginBottom: '5px'
+    marginBottom: '5px',
+    color: 'white'
   }
   const heroTagline = {
-    fontSize: '30px',
+    fontWeight: 'normal',
+    color: 'white',
+    fontSize: '24px',
     fontWeight: 'normal'
   }
 
   const buttonStyle = {
     backgroundColor: '#73C2FB',
-    // backgroundColor: '#FFA711',
-    width: '150px',
-    height: '70px',
-    fontSize: '24px',
-    color: 'white',
-    textTransform: 'capitalize',
-    borderRadius: '5%',
-    marginTop: '20px'
+
+  fontSize: '20px',
+  color: 'white',
+  
+  borderRadius: '5%',
+  marginTop: '15px',
+  marginBottom: '50px',
+  border: '3px solid white',
+  '&:hover': {
+    background: 'blue'
+  }
+
   }
 
   const section = {
     display: 'flex',
     width: '100%',
-    height: '600px',
+    height: '330px',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -125,18 +133,20 @@ function Home() {
   const h3 = {
     textAlign: 'left',
     lineHeight: '1.2',
+    fontSize: '40px',
     textDecoration: 'underline',
-    textDecorationColor: '#73C2FB'
+    textDecorationColor: '#73C2FB',
+    fontSize: '36px',
     // color: '#73C2FB'
   }
   const h4 = {
     textAlign: 'left',
-    fontSize: '26px',
+    fontSize: '20px',
     marginTop: '25px',
     lineHeight: '2'
   }
   const imgStyle = {
-    width: '75%',
+    width: '70%',
     boxShadow: '-15px 15px 30px #73C2FB',
     borderRadius:'50%'
   }
@@ -145,15 +155,35 @@ function Home() {
     color: 'white',
     textDecoration: 'none'
   }
+  const [isUser, setIsUser] = useState(false);
+
+  
+
+
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        setIsUser(true)
+      }
+  
+      else{
+        setIsUser(false)
+      }
+    });
+
+  }, []);
+
+
   return (
     <div>
       <Navbar/>
       <Box style={imageBoxStyle}>
         <Box style={overlayBoxStyle}>
           <Box style={overlayBoxText}>
-              <h1 style={heroTitle}>A tech hub for students and companies</h1>
+                                                  {/* font-family: 'Slabo 27px', serif; */}
+              <h1 style={heroTitle}>A <span style={{color:'#a1d6fc', fontStyle: 'oblique', fontFamily:'Slabo, serif'}}>tech hub</span> for students and companies</h1>
               <h2 style={heroTagline}>Discover top talent. Connect with industry professionals. Work on meaningful projects.</h2>
-              <Button style={buttonStyle}><Link style={linkStyle} to="/SignIn">Join Us</Link></Button>
+             { (!isUser) ? <Button style={buttonStyle}><Link style={linkStyle} to="/SignUp">Join Us</Link></Button> : null}
           </Box>
         </Box>
 
@@ -190,10 +220,9 @@ function Home() {
           <img src={app} style={imgStyle}></img>
         </Box>
       </Box>
-
+      <Footer/>
     </div>
   );
 
 }
-export default Home;
 

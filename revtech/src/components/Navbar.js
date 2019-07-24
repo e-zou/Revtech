@@ -27,6 +27,11 @@ const useStyles = makeStyles(theme => ({
 function Navbar(props){
     const classes = useStyles();
     const [user, setUser] = useState(null); // sees if someone is logged in
+    const [perm, setPerm] = useState(null);
+
+    const studentLinks = {
+
+    }
 
     function handleLogOut() {
       setUser(null);
@@ -35,15 +40,40 @@ function Navbar(props){
 
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
-        setUser(true);
+
+        if(user.uid ==='ROLEjTfVWdba8LJYDC6PfsVEZhz2'){
+          setPerm('admin');
+          setUser(user);
+        }
+        else{
+        let studRef = firebase.database().ref(`/students/${user.uid}`);
+        const compRef = firebase.database().ref('/companies');
+        compRef.on("value", snap => {
+          const compObj = snap.val();
+          const compKeys = Object.keys(compObj);
+          const isComp = compKeys.some(key => {
+            return compObj[key].companyid === user.uid;
+          });
+          if (isComp) {
+            setPerm('company');
+            studRef = null;
+          }
+        });
+        if (studRef) {
+          setPerm('student');
+        } 
+        setUser(user);
+      }
       } else {
         setUser(null);
       }
+
+
     });
 
     const navBarStyle = {
       backgroundColor: '#73C2FB',
-      padding: "1.5% 1%",
+      padding: "1% 1%",
     }
 
     const linkStyle = {
@@ -55,9 +85,14 @@ function Navbar(props){
       border: '3px solid white',
       color:'white',
       width: '100px',
-      height: '55px',
+      height: '40px',
       borderRadius: '5%',
       textDecoration: 'none',
+    }
+    console.log(user);
+
+    const logoStyle = {
+      color: 'white'
     }
 
     return (
@@ -75,7 +110,7 @@ function Navbar(props){
         >
           <Avatar alt="logo" src={logo}></Avatar>
           <Link style={linkStyle} to="/">
-            <Typography variant="h4" to="/" >
+            <Typography variant="h4" to="/" style={logoStyle}>
               RevTek
             </Typography>
           </Link>
@@ -88,15 +123,45 @@ function Navbar(props){
           color="inherit"
           width="45%"
         >
-          <Button color="inherit"><Link style={linkStyle} to="/Marketplace">Marketplace</Link></Button>
-          <Button color="inherit"><Link style={linkStyle} to="/Companies">Companies</Link></Button>
-          <Button color="inherit"><Link style={linkStyle} to="/Students">Students</Link></Button>
-          {/* Contracts only appear to Company Type User*/}
-          {/* Will update this later to just 'Profile' when we get separate navbars */}
-          {user == null ? null : <Button color="inherit"><Link style={linkStyle} to="/CompanyProfile">Company Profile</Link></Button>}
-          {user == null ? null : <Button color="inherit"><Link style={linkStyle} to="/Contract">Contract</Link></Button>}
-          {user !==null ? null : <Button color="inherit" style={specialButtonStyle}><Link style={linkStyle} to="/SignIn">Login</Link></Button>}
-          {user == null ? null : <Button color="inherit" onClick={handleLogOut}><Link style={linkStyle} to="/">Logout</Link></Button>}
+
+          {(user && perm === "student") 
+            ? <React.Fragment>
+            
+            <Button color="inherit"><Link style={linkStyle} to="/ProfilePage">My Profile</Link></Button>
+            <Button color="inherit"><Link style={linkStyle} to="/Marketplace">Marketplace</Link></Button>
+
+            </React.Fragment>
+            : null
+          }
+          {(user && perm === "company") 
+            ? <React.Fragment>
+                <Button color="inherit"><Link style={linkStyle} to="/Contract">Contract</Link></Button>
+                <Button color="inherit"><Link style={linkStyle} to="/CompanyProfile">Profile</Link></Button>
+              </React.Fragment>
+            : null
+          }
+          {(user && perm === "admin")
+            ? <React.Fragment>
+                <Button color="inherit"><Link style={linkStyle} to="/Marketplace">Marketplace</Link></Button>
+                <Button color="inherit"><Link style={linkStyle} to="/Approval">Approval</Link></Button>
+              </React.Fragment>
+            : null
+          }
+          {(user) 
+            ? <React.Fragment>
+                <Button color="inherit"><Link style={linkStyle} to="/Companies">Companies</Link></Button>
+                <Button color="inherit"><Link style={linkStyle} to="/Students">Students</Link></Button>
+                <Button color="inherit" style={specialButtonStyle} onClick={handleLogOut}><Link style={linkStyle} to="/">Logout</Link></Button>
+              </React.Fragment>
+            : <React.Fragment>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <Button color="inherit" style={specialButtonStyle}><Link style={linkStyle} to="/SignIn">Login</Link></Button>
+              </React.Fragment>
+            
+          }
         </Box>
       </Box>
     </div>
